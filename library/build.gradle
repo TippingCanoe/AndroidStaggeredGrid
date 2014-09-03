@@ -1,27 +1,41 @@
 apply plugin: 'com.android.library'
 
 repositories {
-    mavenCentral()
+	mavenCentral()
 }
 
 dependencies {
-    compile rootProject.ext.supportPackageVersion
+	compile 'com.android.support:appcompat-v7:20.0.0'
 }
 
 version = VERSION_NAME
 group = GROUP
 
 android {
-    compileSdkVersion rootProject.ext.compileSdkVersion
-    buildToolsVersion rootProject.ext.buildToolsVersion
+	compileSdkVersion 20
+	buildToolsVersion '20.0.0'
 
-    defaultConfig {
-        minSdkVersion 9
-    }
+	defaultConfig {
+		minSdkVersion 9
+	}
 
-    lintOptions {
-        abortOnError false
-    }
+	lintOptions {
+		abortOnError false
+	}
 }
 
-//apply from: 'https://raw.github.com/chrisbanes/gradle-mvn-push/master/gradle-mvn-push.gradle'
+apply plugin: 'maven'
+
+uploadArchives {
+	repositories {
+		mavenDeployer {
+			pom.project {
+				name project.getName()
+			}
+			repository url: 'file://' + new File(System.getProperty('user.home'), '.m2/repository').absolutePath
+			repository(url: 'http://archiva.tippingcanoe.com/repository/' + (version.endsWith('-SNAPSHOT') ? 'snapshots' : 'internal') + '/') {
+				authentication(userName: mavenUser, password: mavenPassword)
+			}
+		}
+	}
+}
