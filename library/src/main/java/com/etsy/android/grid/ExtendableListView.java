@@ -139,7 +139,7 @@ public abstract class ExtendableListView extends AbsListView {
 
     protected boolean mClipToPadding;
     private PerformClick mPerformClick;
-    
+
     private Runnable mPendingCheckForTap;
     private CheckForLongPress mPendingCheckForLongPress;
 
@@ -307,6 +307,20 @@ public abstract class ExtendableListView extends AbsListView {
     public int getCount() {
         return mItemCount;
     }
+
+	protected void setFirstPosition(int position) {
+		if (position >= 0) {
+			mLayoutMode = LAYOUT_NORMAL;
+			mSpecificTop = getListPaddingTop();
+			mFirstPosition = position;
+			if (mNeedSync) {
+				mSyncPosition = position;
+				mSyncRowId = mAdapter.getItemId(position);
+			}
+
+			requestLayout();
+		}
+	}
 
     // //////////////////////////////////////////////////////////////////////////////////////////
     // ADAPTER VIEW - UNSUPPORTED
@@ -676,6 +690,16 @@ public abstract class ExtendableListView extends AbsListView {
         // TO override
     }
 
+	/**
+	 * Rewdraws the visible rows on screen with their new data.
+	 */
+	public void redrawVisibleChildren() {
+		for(int i=getFirstVisiblePosition(), j=getLastVisiblePosition(); i<=j;i++) {
+			View view = getChildAt(i);
+			getAdapter().getView(i, view, this);
+		}
+	}
+
     // //////////////////////////////////////////////////////////////////////////////////////////
     // MEASUREMENT
     //
@@ -872,7 +896,7 @@ public abstract class ExtendableListView extends AbsListView {
             }
         }
     }
-    
+
     private boolean onTouchDown(final MotionEvent event) {
         final int x = (int) event.getX();
         final int y = (int) event.getY();
@@ -956,11 +980,11 @@ public abstract class ExtendableListView extends AbsListView {
         setPressed(false);
         invalidate(); // redraw selector
         final Handler handler = getHandler();
-        
+
         if (handler != null) {
             handler.removeCallbacks(mPendingCheckForLongPress);
         }
-        
+
         recycleVelocityTracker();
         mActivePointerId = INVALID_POINTER;
         return true;
@@ -979,14 +1003,14 @@ public abstract class ExtendableListView extends AbsListView {
 
         setPressed(false);
         invalidate(); // redraw selector
-        
+
         final Handler handler = getHandler();
         if (handler != null) {
             handler.removeCallbacks(mPendingCheckForLongPress);
         }
-        
+
         recycleVelocityTracker();
-        
+
         mActivePointerId = INVALID_POINTER;
         return true;
     }
@@ -1029,18 +1053,18 @@ public abstract class ExtendableListView extends AbsListView {
                 if (mTouchMode != TOUCH_MODE_DOWN) {
                     child.setPressed(false);
                 }
-    
+
                 if (mPerformClick == null) {
                     invalidate();
                     mPerformClick = new PerformClick();
                 }
-    
+
                 final PerformClick performClick = mPerformClick;
                 performClick.mClickMotionPosition = motionPosition;
                 performClick.rememberWindowAttachCount();
-    
+
     //            mResurrectToPosition = motionPosition;
-    
+
                 if (mTouchMode == TOUCH_MODE_DOWN || mTouchMode == TOUCH_MODE_TAP) {
                     final Handler handler = getHandler();
                     if (handler != null) {
@@ -2875,7 +2899,7 @@ public abstract class ExtendableListView extends AbsListView {
             }
         }
     }
-    
+
     private boolean performLongPress(final View child,
             final int longPressPosition, final long longPressId) {
         boolean handled = false;
@@ -2893,7 +2917,7 @@ public abstract class ExtendableListView extends AbsListView {
             performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
         }
         return handled;
-    }    
+    }
 
     /**
      * A base class for Runnables that will check that their view is still attached to

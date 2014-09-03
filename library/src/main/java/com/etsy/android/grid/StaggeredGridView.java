@@ -218,19 +218,19 @@ public class StaggeredGridView extends ExtendableListView {
         mGridPaddingRight = right;
         mGridPaddingBottom = bottom;
     }
-    
+
     public void setColumnCountPortrait(int columnCountPortrait) {
     	mColumnCountPortrait = columnCountPortrait;
     	onSizeChanged(getWidth(), getHeight());
     	requestLayoutChildren();
     }
-    
+
     public void setColumnCountLandscape(int columnCountLandscape) {
     	mColumnCountLandscape = columnCountLandscape;
     	onSizeChanged(getWidth(), getHeight());
     	requestLayoutChildren();
     }
-    
+
     public void setColumnCount(int columnCount) {
     	mColumnCountPortrait = columnCount;
     	mColumnCountLandscape = columnCount;
@@ -333,6 +333,18 @@ public class StaggeredGridView extends ExtendableListView {
     // POSITIONING
     //
 
+	public void setFirstVisiblePosition(int position) {
+		if (position < getHeaderViewsCount()) {
+			setFirstPosition(position);
+		} else {
+			int div = position % mColumnCount;
+			int nPosition = position - div + getHeaderViewsCount();
+			setFirstPosition(nPosition);
+
+			redrawVisibleChildren();
+		}
+	}
+
     @Override
     protected void onChildCreated(final int position, final boolean flowDown) {
         super.onChildCreated(position, flowDown);
@@ -347,7 +359,7 @@ public class StaggeredGridView extends ExtendableListView {
             setPositionIsHeaderFooter(position);
         }
     }
-    
+
     private void requestLayoutChildren() {
         final int count = getChildCount();
         for (int i = 0; i < count; i++) {
