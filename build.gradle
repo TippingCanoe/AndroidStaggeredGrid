@@ -13,13 +13,14 @@ allprojects {
 	}
 }
 
-def isReleaseBuild () {
-	return version.contains("SNAPSHOT") == false
+def isReleaseBuild() {
+    return version.contains("SNAPSHOT") == false
 }
 
 allprojects {
 
-	repositories {
-		mavenCentral()
-	}
+
+    repositories {
+        mavenCentral()
+    }
 }
