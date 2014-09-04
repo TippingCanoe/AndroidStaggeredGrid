@@ -59,7 +59,7 @@ public class StaggeredGridView extends ExtendableListView {
     private int mGridPaddingTop;
     private int mGridPaddingBottom;
 
-    /***
+    /**
      * Our grid item state record with {@link Parcelable} implementation
      * so we can persist them across the SGV lifecycle.
      */
@@ -221,9 +221,6 @@ public class StaggeredGridView extends ExtendableListView {
     // //////////////////////////////////////////////////////////////////////////////////////////
     // MEASUREMENT
     //
-    private boolean isLandscape() {
-        return getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
-    }
 
     @Override
     protected void onMeasure(final int widthMeasureSpec, final int heightMeasureSpec) {
@@ -317,8 +314,7 @@ public class StaggeredGridView extends ExtendableListView {
 			int div = position % mColumnCount;
 			int nPosition = position - div + getHeaderViewsCount();
 			setFirstPosition(nPosition);
-
-			redrawVisibleChildren();
+			notifyAdapterDataSetChanged();
 		}
 	}
 
@@ -862,35 +858,39 @@ public class StaggeredGridView extends ExtendableListView {
         super.onSizeChanged(w, h, oldw, oldh);
 	    if (oldw != w || oldh != h || mColumnTops == null || mColumnTops.length != mColumnCount
 			    || mColumnBottoms == null || mColumnBottoms.length != mColumnCount || mColumnLefts == null || mColumnLefts.length != mColumnCount) {
-		    onSizeChanged(w, h);
+		    updateSizes(w, h);
 	    }
     }
 
     @Override
     protected void onSizeChanged(int w, int h) {
     	super.onSizeChanged(w, h);
-	    if ( mColumnTops == null || mColumnTops.length != mColumnCount
-			    || mColumnBottoms == null || mColumnBottoms.length != mColumnCount || mColumnLefts == null || mColumnLefts.length != mColumnCount ) {
-		    mColumnWidth = calculateColumnWidth(w);
-
-		    mColumnTops = new int[mColumnCount];
-		    mColumnBottoms = new int[mColumnCount];
-		    mColumnLefts = new int[mColumnCount];
-
-		    mDistanceToTop = 0;
-
-		    // rebuild the columns
-		    initColumnTopsAndBottoms();
-		    initColumnLefts();
-
-		    // if we have data
-		    if (getCount() > 0 && mPositionData.size() > 0) {
-			    onColumnSync();
-		    }
-
-		    requestLayout();
-	    }
+	    updateSizes(w, h);
     }
+
+	private void updateSizes (int w, int h) {
+		if ( mColumnTops == null || mColumnTops.length != mColumnCount
+				|| mColumnBottoms == null || mColumnBottoms.length != mColumnCount || mColumnLefts == null || mColumnLefts.length != mColumnCount ) {
+			mColumnWidth = calculateColumnWidth(w);
+
+			mColumnTops = new int[mColumnCount];
+			mColumnBottoms = new int[mColumnCount];
+			mColumnLefts = new int[mColumnCount];
+
+			mDistanceToTop = 0;
+
+			// rebuild the columns
+			initColumnTopsAndBottoms();
+			initColumnLefts();
+
+			// if we have data
+			if (getCount() > 0 && mPositionData.size() > 0) {
+				onColumnSync();
+			}
+
+			requestLayout();
+		}
+	}
 
     private int calculateColumnWidth(final int gridWidth) {
         final int listPadding = getRowPaddingLeft() + getRowPaddingRight();
@@ -901,7 +901,7 @@ public class StaggeredGridView extends ExtendableListView {
 	    return getRowPaddingLeft() + ((mItemMargin + mColumnWidth) * colIndex);
     }
 
-    /***
+    /**
      * Our mColumnTops and mColumnBottoms need to be re-built up to the
      * mSyncPosition - the following layout request will then
      * layout the that position and then fillUp and fillDown appropriately.

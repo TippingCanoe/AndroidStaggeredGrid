@@ -296,6 +296,20 @@ public abstract class ExtendableListView extends AbsListView {
     // ADAPTER
     //
 
+	public void notifyAdapterDataSetChanged() {
+		if ( mAdapter != null ) {
+			ListAdapter innerAdapter = mAdapter;
+
+			if (innerAdapter instanceof WrapperListAdapter) {
+				innerAdapter = ((WrapperListAdapter) innerAdapter).getWrappedAdapter();
+			}
+
+			if (innerAdapter instanceof BaseAdapter) {
+				((BaseAdapter) innerAdapter).notifyDataSetChanged();
+			}
+		}
+	}
+
     @Override
     public ListAdapter getAdapter() {
         return mAdapter;
@@ -760,16 +774,6 @@ public abstract class ExtendableListView extends AbsListView {
     public void resetToTop() {
         // TO override
     }
-
-	/**
-	 * Rewdraws the visible rows on screen with their new data.
-	 */
-	public void redrawVisibleChildren() {
-		for(int i=getFirstVisiblePosition(), j=getLastVisiblePosition(); i<=j;i++) {
-			View view = getChildAt(i);
-			getAdapter().getView(i, view, this);
-		}
-	}
 
     // //////////////////////////////////////////////////////////////////////////////////////////
     // MEASUREMENT
@@ -1686,7 +1690,7 @@ public abstract class ExtendableListView extends AbsListView {
         return selectedView;
     }
 
-    /***
+    /**
      * Override to tell filling flow to continue to fill up as we have space.
      */
     protected boolean hasSpaceDown() {
@@ -1711,7 +1715,7 @@ public abstract class ExtendableListView extends AbsListView {
         return selectedView;
     }
 
-    /***
+    /**
      * Override to tell filling flow to continue to fill up as we have space.
      */
     protected boolean hasSpaceUp() {
@@ -2283,7 +2287,7 @@ public abstract class ExtendableListView extends AbsListView {
         mFlingRunnable.start((int) -velocity);
     }
 
-    private void stopFlingRunnable() {
+    protected void stopFlingRunnable() {
         if (mFlingRunnable != null) {
             mFlingRunnable.endFling();
 	        mFlingRunnable = null;
