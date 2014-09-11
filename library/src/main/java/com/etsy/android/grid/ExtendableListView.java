@@ -370,6 +370,20 @@ public abstract class ExtendableListView extends AbsListView {
 		}
 	}
 
+	protected void setFirstPositionSilently(int position) {
+		if (position >= 0) {
+			mLayoutMode = LAYOUT_NORMAL;
+			mSpecificTop = getListPaddingTop();
+			mFirstPosition = position;
+			if (mNeedSync) {
+				mSyncPosition = position;
+				mSyncRowId = mAdapter.getItemId(position);
+			}
+
+			requestLayout();
+		}
+	}
+
 	protected ContextMenu.ContextMenuInfo mContextMenuInfo = null;
 
 	@Override

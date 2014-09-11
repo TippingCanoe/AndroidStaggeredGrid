@@ -325,6 +325,24 @@ public class StaggeredGridView extends ExtendableListView {
 		}
 	}
 
+	public void setFirstVisiblePositionSilently(int position) {
+		if (mColumnBottoms != null) {
+			Arrays.fill(mColumnBottoms, 0);
+		}
+		if (mColumnTops != null) {
+			Arrays.fill(mColumnTops, 0);
+		}
+
+		if (position < getHeaderViewsCount()) {
+			setFirstPositionSilently(position);
+		} else {
+			int div = position % mColumnCount;
+			int nPosition = position - div + getHeaderViewsCount();
+			setFirstPositionSilently(nPosition);
+			//notifyAdapterDataSetChanged();
+		}
+	}
+
     @Override
     protected void onChildCreated(final int position, final boolean flowDown) {
         super.onChildCreated(position, flowDown);
