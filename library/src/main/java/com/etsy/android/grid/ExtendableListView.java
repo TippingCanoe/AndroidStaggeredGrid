@@ -27,9 +27,12 @@ import android.os.Parcelable;
 import android.support.v4.util.SparseArrayCompat;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v4.view.ViewCompat;
+import android.support.v4.widget.ScrollerCompat;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.*;
+import android.view.animation.Interpolator;
+import android.view.animation.OvershootInterpolator;
 import android.widget.*;
 
 import java.util.ArrayList;
@@ -2381,7 +2384,7 @@ public abstract class ExtendableListView extends AbsListView {
         /**
          * Tracks the decay of a fling scroll
          */
-        private final OverScroller mScroller;
+        private final ScrollerCompat mScroller;
 
         /**
          * Y value reported by mScroller on the previous fling
@@ -2389,13 +2392,13 @@ public abstract class ExtendableListView extends AbsListView {
         private int mLastFlingY;
 
         FlingRunnable() {
-            mScroller = new OverScroller(getContext());
+            mScroller = ScrollerCompat.create(getContext(), new OvershootInterpolator());
         }
 
         void start(int initialVelocity) {
             int initialY = initialVelocity < 0 ? Integer.MAX_VALUE : 0;
             mLastFlingY = initialY;
-            mScroller.forceFinished(true);
+            mScroller.abortAnimation();
             mScroller.fling(0, initialY, 0, initialVelocity, 0, Integer.MAX_VALUE, 0, Integer.MAX_VALUE);
             mTouchMode = TOUCH_MODE_FLINGING;
             postOnAnimate(this);
@@ -2416,7 +2419,7 @@ public abstract class ExtendableListView extends AbsListView {
             reportScrollStateChange(OnScrollListener.SCROLL_STATE_IDLE);
             removeCallbacks(this);
 
-            mScroller.forceFinished(true);
+            mScroller.abortAnimation();
         }
 
         public void run() {
@@ -2430,7 +2433,7 @@ public abstract class ExtendableListView extends AbsListView {
                         return;
                     }
 
-                    final OverScroller scroller = mScroller;
+                    final ScrollerCompat scroller = mScroller;
                     boolean more = scroller.computeScrollOffset();
                     final int y = scroller.getCurrY();
 
