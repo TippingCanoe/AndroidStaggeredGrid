@@ -375,12 +375,9 @@ public abstract class ExtendableListView extends AbsListView {
 			mLayoutMode = LAYOUT_NORMAL;
 			mSpecificTop = getListPaddingTop();
 			mFirstPosition = position;
-			if (mNeedSync) {
-				mSyncPosition = position;
-				mSyncRowId = mAdapter.getItemId(position);
-			}
-
-			requestLayout();
+			mNeedSync = true;
+			mSyncPosition = position;
+			mSyncRowId = mAdapter.getItemId(position);
 		}
 	}
 

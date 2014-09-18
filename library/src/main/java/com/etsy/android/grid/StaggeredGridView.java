@@ -335,11 +335,12 @@ public class StaggeredGridView extends ExtendableListView {
 
 		if (position < getHeaderViewsCount()) {
 			setFirstPositionSilently(position);
-		} else {
+		} else if ( position <= getCount() ) {
 			int div = position % mColumnCount;
 			int nPosition = position - div + getHeaderViewsCount();
 			setFirstPositionSilently(nPosition);
-			//notifyAdapterDataSetChanged();
+			onColumnSync();
+			notifyAdapterDataSetChanged();
 		}
 	}
 
