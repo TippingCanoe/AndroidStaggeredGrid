@@ -207,7 +207,9 @@ public class StaggeredGridView extends ExtendableListView {
         mGridPaddingBottom = bottom;
     }
 
+
 	public void setColumnCount(int columnCount) {
+
 		if (columnCount > 0 && columnCount != mColumnCount) {
 			mColumnCount = columnCount;
 			forceLayout();
@@ -344,6 +346,23 @@ public class StaggeredGridView extends ExtendableListView {
 		}
 	}
 
+	public void smoothScrollToFirstVisiblePosition(int position) {
+		if (mColumnBottoms != null) {
+			Arrays.fill(mColumnBottoms, 0);
+		}
+		if (mColumnTops != null) {
+			Arrays.fill(mColumnTops, 0);
+		}
+
+		if (position < getHeaderViewsCount()) {
+			smoothScrollToPosition(position);
+		} else {
+			int div = position % mColumnCount;
+			int nPosition = position - div + getHeaderViewsCount();
+			smoothScrollToPosition(nPosition);
+		}
+	}
+
     @Override
     protected void onChildCreated(final int position, final boolean flowDown) {
         super.onChildCreated(position, flowDown);
@@ -360,11 +379,17 @@ public class StaggeredGridView extends ExtendableListView {
     }
 
     private void requestLayoutChildren() {
+
         final int count = getChildCount();
+
         for (int i = 0; i < count; i++) {
+
             final View v = getChildAt(i);
+
             if (v != null) v.requestLayout();
+
         }
+
     }
 
     @Override
@@ -884,19 +909,6 @@ public class StaggeredGridView extends ExtendableListView {
         super.onSizeChanged(w, h, oldw, oldh);
 	    if (oldw != w || oldh != h || mColumnTops == null || mColumnTops.length != mColumnCount
 			    || mColumnBottoms == null || mColumnBottoms.length != mColumnCount || mColumnLefts == null || mColumnLefts.length != mColumnCount) {
-		    updateSizes(w, h);
-	    }
-    }
-
-    @Override
-    protected void onSizeChanged(int w, int h) {
-    	super.onSizeChanged(w, h);
-	    updateSizes(w, h);
-    }
-
-	private void updateSizes (int w, int h) {
-		if ( mColumnTops == null || mColumnTops.length != mColumnCount
-				|| mColumnBottoms == null || mColumnBottoms.length != mColumnCount || mColumnLefts == null || mColumnLefts.length != mColumnCount ) {
 			mColumnWidth = calculateColumnWidth(w);
 
 			mColumnTops = new int[mColumnCount];
@@ -916,7 +928,9 @@ public class StaggeredGridView extends ExtendableListView {
 
 			requestLayout();
 		}
+
 	}
+
 
     private int calculateColumnWidth(final int gridWidth) {
         final int listPadding = getRowPaddingLeft() + getRowPaddingRight();
@@ -955,11 +969,12 @@ public class StaggeredGridView extends ExtendableListView {
 
         for (int pos = 0; pos < syncPosition; pos++) {
             //Check for weirdness again
+
             final Double heightRatio = positionHeightRatios.get(pos);
+
             if(heightRatio == null){
                 break;
             }
-
             final GridItemRecord rec = getOrCreateRecord(pos);
             final int height = (int) (mColumnWidth * heightRatio);
             rec.heightRatio = heightRatio;
@@ -1306,7 +1321,6 @@ public class StaggeredGridView extends ExtendableListView {
         };
     }
 
-
     @Override
     public Parcelable onSaveInstanceState() {
 	    stableView();
@@ -1345,6 +1359,7 @@ public class StaggeredGridView extends ExtendableListView {
 		    mColumnTops = ss.columnTops;
 		    mColumnBottoms = new int[mColumnCount];
 	    }
+
 
         mNeedSync = true;
         super.onRestoreInstanceState(ss);

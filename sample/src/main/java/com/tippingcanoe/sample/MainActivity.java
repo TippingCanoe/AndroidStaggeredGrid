@@ -12,6 +12,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.os.Build;
+import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import com.etsy.android.grid.StaggeredGridView;
@@ -87,15 +88,26 @@ public class MainActivity extends ActionBarActivity {
 		    scrollToItemButton.setOnClickListener(new View.OnClickListener() {
 			    @Override
 			    public void onClick ( View view ) {
-				    staggeredGridView.setFirstVisiblePositionSilently(20);
+				    staggeredGridView.setFirstVisiblePositionSilently(50);
 			    }
 		    });
 
 		    scrollToTopButton.setOnClickListener(new View.OnClickListener() {
 			    @Override
 			    public void onClick ( View view ) {
-				    Log.v("Iain", staggeredGridView.getDistanceToTop() + "");
 				    staggeredGridView.smoothScrollBy(staggeredGridView.getDistanceToTop(), 1000);
+			    }
+		    });
+
+		    staggeredGridView.setOnScrollListener(new AbsListView.OnScrollListener() {
+			    @Override
+			    public void onScrollStateChanged ( AbsListView view, int scrollState ) {
+
+			    }
+
+			    @Override
+			    public void onScroll ( AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount ) {
+				   Log.v("Iain", ((StaggeredGridView) view).getDistanceToTop() + " < Distance");
 			    }
 		    });
 	    }
