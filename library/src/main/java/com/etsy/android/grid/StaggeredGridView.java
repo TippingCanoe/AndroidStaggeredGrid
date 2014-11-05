@@ -213,6 +213,12 @@ public class StaggeredGridView extends ExtendableListView {
 		if (columnCount > 0 && columnCount != mColumnCount) {
 			mColumnCount = columnCount;
 			forceLayout();
+			post(new Runnable() {
+				@Override
+				public void run () {
+					notifyAdapterDataSetChanged();
+				}
+			});
 		}
 	}
 
@@ -342,7 +348,7 @@ public class StaggeredGridView extends ExtendableListView {
 			int nPosition = position - div + getHeaderViewsCount();
 			setFirstPositionSilently(nPosition);
 			onColumnSync();
-			notifyAdapterDataSetChanged();
+			//notifyAdapterDataSetChanged();
 		}
 	}
 
@@ -950,14 +956,25 @@ public class StaggeredGridView extends ExtendableListView {
         // re-calc tops for new column count!
         int syncPosition = Math.min(mSyncPosition, getCount() - 1);
 
+
+	    double heighRatioSum = 0.0d;
+	    for(int i = 0; i < mPositionData.size(); i++) {
+		    heighRatioSum += mPositionData.valueAt(i).heightRatio;
+	    }
+
+	    double avgHeightRatio = heighRatioSum / mPositionData.size();
+
         SparseArray<Double> positionHeightRatios = new SparseArray<Double>(syncPosition);
         for (int pos = 0; pos < syncPosition; pos++) {
             // check for weirdness
             final GridItemRecord rec = mPositionData.get(pos);
-            if (rec == null) break;
 
-            Log.d(TAG, "onColumnSync:" + pos + " ratio:" + rec.heightRatio);
-            positionHeightRatios.append(pos, rec.heightRatio);
+            if (rec == null) {
+				positionHeightRatios.append(pos, avgHeightRatio);
+            } else {
+	            Log.d(TAG, "onColumnSync:" + pos + " ratio:" + rec.heightRatio);
+	            positionHeightRatios.append(pos, rec.heightRatio);
+            }
         }
 
         mPositionData.clear();
